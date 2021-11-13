@@ -109,6 +109,10 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+# 指明用户表的model,必须要指明，数据库迁移的时候才能找到对象的model,配置方法：app名称.model类名，app名称已经配置到INSTALLED_APPS
+AUTH_USER_MODEL = 'users.UserProfile'
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
