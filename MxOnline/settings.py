@@ -13,8 +13,9 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+import django.template.context_processors
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
@@ -27,7 +28,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -37,6 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'captcha',  # captcha为第三方的图片验证码工具
+    'crispy_forms',  # xadmin的依赖库，需要安装在xadmin之前
+    'xadmin.apps.XAdminConfig',  # 注册xadmin
     'apps.users.apps.UsersConfig',
     'apps.operations.apps.OperationsConfig',
     'apps.organizations.apps.OrganizationsConfig',
@@ -58,15 +61,17 @@ ROOT_URLCONF = 'MxOnline.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        # 'DIRS': [BASE_DIR / 'templates'],  已经 不支持这个方式了，换用下面的方式
-        'DIRS': [str.format(BASE_DIR, '/templates')],
+        # 'DIRS': [BASE_DIR / 'templates'],  # 已经 不支持这个方式了，换用下面的方式
+        'DIRS':[os.path.join(BASE_DIR,'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
+                # django会把request对象放到TEMPLATES中做全局变量，好在任意一个HTML中使用request对象的属性
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.media',  # 将MEDIA_URL路径注入到HTML的全局变量中，在任意HTML文件中访问
             ],
         },
     },
@@ -74,23 +79,21 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'MxOnline.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {
     'default': {
         # 'ENGINE': 'django.db.backends.sqlite3',
-        'ENGINE': 'django.db.backends.mysql',       # 需要安装mysql的驱动mysqlclient
+        'ENGINE': 'django.db.backends.mysql',  # 需要安装mysql的驱动mysqlclient
         'NAME': 'mxonline',
         'USER': 'root',
-        'PASSWORD':'root',
-        'HOST':'127.0.0.1'
+        'PASSWORD': 'root',
+        'HOST': '127.0.0.1'
     }
 }
 
-
-# Password validation
+# Password validation 密码验证
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -108,31 +111,46 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # 指明用户表的model,必须要指明，数据库迁移的时候才能找到对象的model,配置方法：app名称.model类名，app名称已经配置到INSTALLED_APPS
 AUTH_USER_MODEL = 'users.UserProfile'
 
+# 让model中在没有主动创建主键的时候用django自动创建的主键
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+# LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'zh-hans'  # 修改为中文
 
-TIME_ZONE = 'UTC'
+# TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Shanghai'  # 修改时区
 
 USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
-
+# USE_TZ = True  # 当设置了 USE_TZ 为 True 时，Django 与其余系统或服务的交流将强制使用 UTC 时间
+USE_TZ = False      # 修改系统对时区的默认强制UTC支持
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
-STATIC_URL = '/static/'     # STATIC_URL为定义在每个app目录下的static文件夹
+STATIC_URL = '/static/'  # STATIC_URL为定义在每个app目录下的static文件夹
 
 # STATICFILES_DIRS 为定义的任意路径的static文件路径
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
+
+# 配置上传的媒体文件的路径
+MEDIA_URL = "/media/"       # 也就是所有上床的文件的路径都在前面加上/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # 指明上传的文件存放的位置
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+# 云片网相关设置
+yp_apikey = 'e3a4560f4769ffef24077aa73ec8498f'
+
+# redis相关配置
+REDIS_HOST = 'localhost'
+REDIS_PORT = 6379

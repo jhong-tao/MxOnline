@@ -15,7 +15,44 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.conf.urls import url, include   # url路由方式支持正则表达式
+from django.views.generic import TemplateView  # TemplateView 方法用来渲染一个静态的HTML页面
+from django.views.decorators.csrf import csrf_exempt  # csrf_exempt方法用来去除url访问时的csrf_token的验证
+from django.views.static import serve  # serve静态文件处理的方法
+
+
+import xadmin
+
+from apps.users.views import LoginView, RegisterView, LogoutView, SendSmsView, DynamicLoginView
+from apps.organizations.views import OrgView
+from MxOnline.settings import MEDIA_ROOT
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # path('admin/', admin.site.urls),
+    url(r'^captcha/', include('captcha.urls')),  # 配置captcha图像验证码工具
+    path('xadmin/', xadmin.site.urls),
+    # TemplateView.as_view方法会自动返回一个view函数来简单的返回一个HTML静态页面
+    # 如果要动态的显示html页面，那么view函数需要自己写
+    path('', TemplateView.as_view(template_name='index.html'), name='index'),
+    #  'login/'和'login'，有斜线的两种模式都可以访问
+    # name参数用来代表‘login/’访问地址的别名，方便在html的其它位置使用
+    path('login/', LoginView.as_view(), name='login'),
+    path('d_login/', DynamicLoginView.as_view(), name='d_login'),
+    path('logout/', LogoutView.as_view(), name='logout'),
+    path('register/', RegisterView.as_view(), name='register'),
+    url(r'^send_sms/', csrf_exempt(SendSmsView.as_view()), name='send_sms'),  # 图片动态验证码的路由，前端ajax访问
+
+    # 配置上传文件的URL
+    url(r'^media/(?P<path>.*)$', serve, {'document_root': MEDIA_ROOT}),
+
+    # 机构相关的页面
+    url(r'^org_list/',OrgView.as_view(), name='org_list')
 ]
+
+# 1. CBV(class vase view)  FBV(function base view)
+
+# 编写一个View的几个步骤：
+# 1. view代码
+# 2. 配置url
+# 3. 修改HTML中相关的地址
+

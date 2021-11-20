@@ -1,0 +1,7 @@
+1. 下载xadmin源码
+2. 在settings的INSTALLED_APPS中添加
+    crispy_forms 和 xadmin
+3. 安装xadmin的依赖包   
+    在xadmin目录下执行下面的命令
+	安装命令：pip install -r requirements.txt
+4. 通过migrate生成xadmin需要的表
