@@ -1,4 +1,5 @@
 # 用来记录开发用到的工具
 django==2.2
-mysqlclient==1.4.6
-requests
+mysqlclient==1.4.6      # mysql驱动
+pillow
+django-pure-pagination  # 分页工具

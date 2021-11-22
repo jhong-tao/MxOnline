@@ -31,15 +31,21 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    # django内部app
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # 第三方app
     'captcha',  # captcha为第三方的图片验证码工具
     'crispy_forms',  # xadmin的依赖库，需要安装在xadmin之前
     'xadmin.apps.XAdminConfig',  # 注册xadmin
+    'pure_pagination',  # 自动分页工具
+
+    # 自己的app
     'apps.users.apps.UsersConfig',
     'apps.operations.apps.OperationsConfig',
     'apps.organizations.apps.OrganizationsConfig',
@@ -60,10 +66,10 @@ ROOT_URLCONF = 'MxOnline.urls'
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',  # django模板引擎
         # 'DIRS': [BASE_DIR / 'templates'],  # 已经 不支持这个方式了，换用下面的方式
-        'DIRS':[os.path.join(BASE_DIR,'templates')],
-        'APP_DIRS': True,
+        'DIRS':[os.path.join(BASE_DIR,'templates')],  # 全局的外部HTML模板目录
+        'APP_DIRS': True,  # 是否查找每个app目录下的templates文件夹中的HTML模板
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -154,3 +160,10 @@ yp_apikey = 'e3a4560f4769ffef24077aa73ec8498f'
 # redis相关配置
 REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
+
+# 分页相关配置
+PAGINATION_SETTINGS = {
+    'PAGE_RANGE_DISPLAYED': 10,     # 省略号中间显示多少页
+    'MARGIN_PAGES_DISPLAYED': 2,    # 省略号前后显示几个连续页码
+    'SHOW_FIRST_PAGE_WHEN_INVALID': True,   # 要不要保持显示第一页
+}

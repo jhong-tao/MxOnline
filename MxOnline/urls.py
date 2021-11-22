@@ -29,7 +29,7 @@ from MxOnline.settings import MEDIA_ROOT
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
-    url(r'^captcha/', include('captcha.urls')),  # 配置captcha图像验证码工具
+    url(r'^captcha/', include('captcha.urls')),  # 配置captcha图像验证码工具，所有以captcha开头的url都定向到captcha.urls文件中
     path('xadmin/', xadmin.site.urls),
     # TemplateView.as_view方法会自动返回一个view函数来简单的返回一个HTML静态页面
     # 如果要动态的显示html页面，那么view函数需要自己写
@@ -45,8 +45,9 @@ urlpatterns = [
     # 配置上传文件的URL
     url(r'^media/(?P<path>.*)$', serve, {'document_root': MEDIA_ROOT}),
 
-    # 机构相关的页面
-    url(r'^org_list/',OrgView.as_view(), name='org_list')
+    # 机构相关的页面, 将所有与机构列表相关的以org开头的url都指向organizations app中的urls文件
+    # 限定organizations.urls的命名空间为namespace='org'，在HTML中对organizations.urls的url的引用变为url 'org:具体url名称'
+    url(r'^org/', include(('apps.organizations.urls', 'organizations'), namespace='org')),
 ]
 
 # 1. CBV(class vase view)  FBV(function base view)

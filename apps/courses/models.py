@@ -1,7 +1,8 @@
 from django.db import models  # django的models类
 
 from apps.users.models import BaseModel  # 自定义的类，默认有添加资源的时间属性
-from apps.organizations.models import Teacher
+from apps.organizations.models import Teacher   # 课程属于教师，教师作为外键
+from apps.organizations.models import CourseOrg  # 课程属于老师，老师属于机构，为了减少查询，可以设置课程属于机构
 
 """
 在app的模型设计的时候，首先需要确定有哪些实体，然后确定出实体的属性和实体之间的关系
@@ -26,6 +27,7 @@ class Course(BaseModel):
     课程表
     """
     teacher = models.ForeignKey(Teacher, verbose_name='讲师', on_delete=models.CASCADE)
+    course_org = models.ForeignKey(CourseOrg, verbose_name='课程机构', null=True, blank=True, on_delete=models.CASCADE)
 
     name = models.CharField(verbose_name='课程名称', max_length=50)
     desc = models.CharField(verbose_name='课程描述', max_length=300)
@@ -40,6 +42,7 @@ class Course(BaseModel):
     teacher_tell = models.CharField(verbose_name='老师告诉你', max_length=300, default='')
     detail = models.TextField(verbose_name='课程详情', default='')
     image = models.ImageField('课程封面', upload_to='courses/%Y/%m', max_length=100)
+    is_classics = models.BooleanField(verbose_name='是否经典', default=False)
 
     def __str__(self):
         return self.name
